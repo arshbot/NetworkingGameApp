@@ -1,7 +1,11 @@
 package com.example.harshagoli.networkinggame;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -10,14 +14,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.provider.ContactsContract;
+import android.content.ContentResolver;
 
 public class OnboardingFlow extends AppCompatActivity {
 
@@ -34,13 +42,16 @@ public class OnboardingFlow extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private ViewPager mViewPager;
+    private Button importContacts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_onboarding_flow);
-
+       // setContentView(R.layout.activity_onboarding_flow);
+        setContentView(R.layout.fragment_set_up_oauth_flow);
+        /**
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -60,6 +71,67 @@ public class OnboardingFlow extends AppCompatActivity {
 //            }
 //        });
 
+         **/
+
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.WRITE_CONTACTS,
+
+        };
+
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
+
+
+        importContacts = (Button) findViewById(R.id.ImportContacts);
+        importContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                loadContacts();
+            }
+        });
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void loadContacts(){
+        StringBuilder builder = new StringBuilder();
+        ContentResolver resolver = getContentResolver();
+        Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
+
+        if(cursor.getCount() > 0){
+            while(cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+
+                if (hasNumber > 0) {
+                    Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
+                    while (cursor1.moveToNext()) {
+                        String phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+
+                    }
+                    cursor1.close();
+                }
+            }
+
+        }
+        cursor.close();
+
+        Log.d("loadContacts",  builder.toString());
     }
 
 
