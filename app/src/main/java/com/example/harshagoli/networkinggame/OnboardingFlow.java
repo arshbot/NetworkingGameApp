@@ -215,6 +215,8 @@ public class OnboardingFlow extends AppCompatActivity {
                 public void onClick(View v) {
 
                     loadContacts();
+                    Intent k = new Intent(getActivity(), SwipeContacts.class);
+                    startActivity(k);
                 }
             });
             return rootView;
@@ -246,8 +248,6 @@ public class OnboardingFlow extends AppCompatActivity {
             cursor.close();
 
             Log.d("loadContacts",  builder.toString());
-            Intent k = new Intent(getActivity(), SwipeContacts.class);
-            startActivity(k);
         }
     }
 }
