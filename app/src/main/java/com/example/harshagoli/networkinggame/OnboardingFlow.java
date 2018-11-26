@@ -85,7 +85,7 @@ public class OnboardingFlow extends AppCompatActivity {
         }
 
 
-        importContacts = (Button) findViewById(R.id.ImportContacts);
+        importContacts = (Button) findViewById(R.id.ImportContactsButton);
         importContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
