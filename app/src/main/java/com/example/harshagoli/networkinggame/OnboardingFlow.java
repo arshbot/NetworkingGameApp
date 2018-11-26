@@ -1,5 +1,6 @@
 package com.example.harshagoli.networkinggame;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import android.view.ViewGroup;
 
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.sarahansari.networkinggame.ContactDetails;
 
 public class OnboardingFlow extends AppCompatActivity {
 
@@ -80,6 +83,10 @@ public class OnboardingFlow extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        if (id == R.id.action_profiledetails) {
+            displayProfileDetailsPage(this.findViewById(R.id.action_profiledetails));
         }
 
         return super.onOptionsItemSelected(item);
@@ -174,5 +181,12 @@ public class OnboardingFlow extends AppCompatActivity {
 //            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
+
+    }
+
+    public void displayProfileDetailsPage(View view)
+    {
+        Intent intent = new Intent(OnboardingFlow.this, ContactDetails.class);
+        startActivity(intent);
     }
 }
