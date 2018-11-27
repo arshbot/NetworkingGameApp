@@ -51,6 +51,7 @@ public class OnboardingFlow extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private Button importContacts;
     private Realm realm = null;
 
     @Override
@@ -84,14 +85,14 @@ public class OnboardingFlow extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
 
-        importContacts = (Button) findViewById(R.id.ImportContacts);
-        importContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                loadContacts(0);
-            }
-        });
+//        importContacts = (Button) findViewById(R.id.ImportContactsButton);
+//        importContacts.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                loadContacts(0);
+//            }
+//        });
     }
 
     public static boolean hasPermissions(Context context, String... permissions) {
@@ -138,41 +139,6 @@ public class OnboardingFlow extends AppCompatActivity {
 
 
 
-    }
-
-    private void loadContacts(){
-        StringBuilder builder = new StringBuilder();
-        ContentResolver resolver = getContentResolver();
-        Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
-        Log.d("loadContacts",Integer.toString(cursor.getCount()) );
-        if(cursor.getCount() > 0) {
-            for (int iter = 0; iter < cursor.getCount(); iter++) {
-                Log.d("loadContacts","Hello" + iter );
-            }
-        }
-
-        if(cursor.getCount() > 0){
-            while(cursor.moveToNext()) {
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-
-                if (hasNumber > 0) {
-                    Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
-                    while (cursor1.moveToNext()) {
-                        Log.d("loadContacts",Integer.toString(cursor1.getCount()) + " sec");
-                        String phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
-
-                    }
-                    cursor1.close();
-                }
-            }
-
-        }
-        cursor.close();
-
-        Log.d("loadContacts",  builder.toString());
     }
 
     @Override
@@ -272,8 +238,10 @@ public class OnboardingFlow extends AppCompatActivity {
          * fragment.
          */
         private Button importContacts;
+        private Realm realm = null;
 
         public SetUpOAuthFragment() {
+            realm = Realm.getDefaultInstance();   //create a object for read and write database
         }
 
         /**
@@ -302,31 +270,36 @@ public class OnboardingFlow extends AppCompatActivity {
         }
 
         private void loadContacts(){
-            StringBuilder builder = new StringBuilder();
-            ContentResolver resolver = getActivity().getContentResolver();
-            Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
 
-            if(cursor.getCount() > 0){
-                while(cursor.moveToNext()) {
-                    String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-
-                    if (hasNumber > 0) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Contact contact = new Contact();
+                    StringBuilder builder = new StringBuilder();
+                    ContentResolver resolver = getActivity().getContentResolver();
+                    Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
+                    Log.d("loadContacts",Integer.toString(cursor.getCount()) + " HERE HERE" );
+                    while(cursor.moveToNext()){
+                        String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                        String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                         Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
-                        while (cursor1.moveToNext()) {
-                            String phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
-
-                        }
+                        cursor1.moveToNext();
+                        String phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         cursor1.close();
+                        contact.setID(id);
+                        contact.setName(name);
+                        contact.setPhoneNumber(phoneNumber);
+                        contact.setIgnored(false);
+                        realm.insertOrUpdate(contact);
+                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+
                     }
+                    cursor.close();
+                    Log.d("loadContacts",  builder.toString());
+
                 }
+            });
 
-            }
-            cursor.close();
-
-            Log.d("loadContacts",  builder.toString());
             Intent k = new Intent(getActivity(), SwipeContacts.class);
             startActivity(k);
         }
