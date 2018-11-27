@@ -119,10 +119,22 @@ public class OnboardingFlow extends AppCompatActivity {
             while(cursor.moveToNext()){
                 String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                 String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
-                cursor1.moveToNext();
-                String phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                cursor1.close();
+                String phoneNumber;
+                int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+                if( hasNumber > 0)
+                {
+                    Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
+                    while (cursor1.moveToNext())
+                    {
+                         phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+                    }
+                    cursor1.close();
+                }
+                else
+                    {
+                    phoneNumber = " ";
+                }
                 contact.setID(id);
                 contact.setName(name);
                 contact.setPhoneNumber(phoneNumber);
