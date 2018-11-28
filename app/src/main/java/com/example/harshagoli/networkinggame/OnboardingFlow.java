@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.michaelwheeler.networkinggame.Contact;
 import com.sarahansari.networkinggame.ContactDetails;
 
 public class OnboardingFlow extends AppCompatActivity {
@@ -87,6 +88,10 @@ public class OnboardingFlow extends AppCompatActivity {
 
         if (id == R.id.action_profiledetails) {
             displayProfileDetailsPage(this.findViewById(R.id.action_profiledetails));
+        }
+
+        if (id == R.id.action_contact) {
+            displayContactPage(this.findViewById(R.id.action_contact));
         }
 
         return super.onOptionsItemSelected(item);
@@ -188,5 +193,12 @@ public class OnboardingFlow extends AppCompatActivity {
     {
         Intent intent = new Intent(OnboardingFlow.this, ContactDetails.class);
         startActivity(intent);
+    }
+
+    public void displayContactPage(View view)
+    {
+        Intent intent = new Intent(OnboardingFlow.this, Contact.class);
+        startActivity(intent);
+
     }
 }

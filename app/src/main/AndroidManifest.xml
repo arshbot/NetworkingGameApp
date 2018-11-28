@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.sarahansari.networkinggame.ContactDetails"></activity>
+        <activity android:name="com.sarahansari.networkinggame.ContactDetails" />
+        <activity android:name="com.michaelwheeler.networkinggame.Contact"></activity>
     </application>
 
 </manifest>
