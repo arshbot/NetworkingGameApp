@@ -1,6 +1,7 @@
 package com.example.harshagoli.networkinggame;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
@@ -16,6 +17,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
+import static android.app.PendingIntent.getActivity;
+
 
 public class SwipeContacts extends Activity {
 
@@ -30,10 +33,10 @@ public class SwipeContacts extends Activity {
 //
 //    }
 
-    @Override
-    public void onBackPressed() {
-        //lol
-    }
+//    @Override
+//    public void onBackPressed() {
+//        //lol
+//    }
 
     SwipeFlingAdapterView flingContainer = null;
 
@@ -79,6 +82,7 @@ public class SwipeContacts extends Activity {
             @Override
             public void onRightCardExit(Object dataObject) {
                 makeToast(SwipeContacts.this, "Right!");
+                setTimer();
             }
 
             @Override
@@ -127,6 +131,11 @@ public class SwipeContacts extends Activity {
         flingContainer.getTopCardListener().selectLeft();
     }
 
+    public void setTimer() {
+        Intent k = new Intent(this, CreateTimerView.class);
+        startActivity(k);
+
+    }
 
 
 

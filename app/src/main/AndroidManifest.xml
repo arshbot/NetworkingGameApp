@@ -23,7 +23,10 @@
         <activity
             android:name=".SwipeContacts"
             android:screenOrientation="portrait" />
-
+        <activity
+            android:name=".CreateTimerView"
+            android:screenOrientation="portrait" />
+        <receiver  android:process=":remote" android:name="AlarmReceiver"></receiver>
     </application>
 
 </manifest>

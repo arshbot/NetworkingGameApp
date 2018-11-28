@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center"
     android:layout_width="250dp"
@@ -7,13 +8,13 @@
 
     <TextView
         android:id="@+id/helloText"
-        android:textSize="40sp"
-        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="#E339"
         android:gravity="center"
-        tools:text="test"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        tools:text="test" />
 
     <View
         android:id="@+id/item_swipe_left_indicator"
