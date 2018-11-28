@@ -89,13 +89,16 @@ public class SwipeContacts extends AppCompatActivity  {
             }
 
             @Override
-            public void onRightCardExit(Object dataObject) {
+            public void onRightCardExit(final Object dataObject) {
                 makeToast(SwipeContacts.this, "Right!");
                 final Calendar c = Calendar.getInstance();
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
                 final TimerModel tm = new TimerModel();
+                
+
+
 
 
 
@@ -130,11 +133,16 @@ public class SwipeContacts extends AppCompatActivity  {
                                                 tm.setMinute(Integer.toString(minute));
                                                 tm.setHourOfDay(Integer.toString(hourOfDay));
 
+
+
+                                                tm.setContactName(dataObject.toString());
                                                 realm.beginTransaction();
                                                 realm.insertOrUpdate(tm);
 
                                                 Log.d("loadSavedTimeHour",  realm.where(TimerModel.class).findFirst().getHourOfDay().toString());
                                                 Log.d("loadSavedTimeMinute",  realm.where(TimerModel.class).findFirst().getMinute().toString());
+                                                Log.d("loadSavedContactName",  realm.where(TimerModel.class).findFirst().getContactName().toString());
+                                                Log.d("Dataobject", dataObject.toString());
                                             }
 
                                         }, mHour, mMinute, false);
