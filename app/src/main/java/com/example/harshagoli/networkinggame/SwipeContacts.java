@@ -91,6 +91,7 @@ public class SwipeContacts extends AppCompatActivity  {
             @Override
             public void onRightCardExit(final Object dataObject) {
                 makeToast(SwipeContacts.this, "Right!");
+
                 final Calendar c = Calendar.getInstance();
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
