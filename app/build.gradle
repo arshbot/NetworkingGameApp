@@ -3,6 +3,7 @@ apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 28
+    apply plugin: 'realm-android'
     defaultConfig {
         applicationId "com.example.harshagoli.networkinggame"
         minSdkVersion 26
@@ -23,6 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {
@@ -33,7 +35,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    
     implementation 'com.lorentzos.swipecards:library:1.0.9'
     implementation 'com.jakewharton:butterknife:5.1.2'
-    //implementation 'com.wdullaer:materialdatetimepicker:4.1.0'
 }

@@ -3,6 +3,7 @@ package com.example.harshagoli.networkinggame;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
@@ -19,16 +20,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.RealmQuery;
 
 
 public class SwipeContacts extends AppCompatActivity  {
 
-    private ArrayList<String> al;
     private Realm realm = null;
+    private RealmResults<Contact> listOfContacts;
     private ArrayAdapter<String> arrayAdapter;
+    final ArrayList<String> listOfContactsArray = null;
     private int i;
     private int mYear, mMonth, mDay, mHour, mMinute;
 //    @Override
@@ -37,6 +40,8 @@ public class SwipeContacts extends AppCompatActivity  {
 //        this.setContentView(R.layout.swipe_contacts);
 //
 //    }
+
+//    private Realm realm = null;
 
     @Override
     public void onBackPressed() {
@@ -54,21 +59,19 @@ public class SwipeContacts extends AppCompatActivity  {
         flingContainer = findViewById(R.id.frame);
 
         Realm.init(this);    //initialize to access database for this activity
-        //Realm.deleteRealm(Realm.getDefaultConfiguration());
-        realm = Realm.getDefaultInstance();
+        realm = Realm.getDefaultInstance();   //create a object for read and write database
+        final ArrayList<String> listOfContactsArray = new ArrayList<String>();
+        listOfContacts = realm.where(Contact.class)
+                .equalTo("isIgnored", Boolean.FALSE)
+//                .between("count", 0, 20)
+                .findAll();
+
+        for (Contact c: listOfContacts) {
+            listOfContactsArray.add(c.getName());
+        }
 
 
-        al = new ArrayList<>();
-        al.add("php");
-        al.add("c");
-        al.add("python");
-        al.add("java");
-        al.add("html");
-        al.add("c++");
-        al.add("css");
-        al.add("javascript");
-
-        arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.helloText, al );
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.contactName, listOfContactsArray);
 
         flingContainer.setAdapter(arrayAdapter);
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
@@ -76,7 +79,7 @@ public class SwipeContacts extends AppCompatActivity  {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
-                al.remove(0);
+                listOfContactsArray.remove(0);
                 arrayAdapter.notifyDataSetChanged();
             }
 
@@ -164,7 +167,7 @@ public class SwipeContacts extends AppCompatActivity  {
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                al.add("XML ".concat(String.valueOf(i)));
+                listOfContactsArray.add("XML ".concat(String.valueOf(i)));
                 arrayAdapter.notifyDataSetChanged();
                 Log.d("LIST", "notified");
                 i++;
@@ -207,6 +210,10 @@ public class SwipeContacts extends AppCompatActivity  {
         flingContainer.getTopCardListener().selectLeft();
     }
 
-
+    public void displayContactsPage(View view)
+    {
+        Intent intent = new Intent(SwipeContacts.this, com.michaelwheeler.networkinggame.Contact.class);
+        startActivity(intent);
+    }
 
 }
