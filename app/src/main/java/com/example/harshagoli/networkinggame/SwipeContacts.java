@@ -1,6 +1,7 @@
 package com.example.harshagoli.networkinggame;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
@@ -126,5 +127,10 @@ public class SwipeContacts extends Activity {
         flingContainer.getTopCardListener().selectLeft();
     }
 
+    public void displayContactsPage(View view)
+    {
+        Intent intent = new Intent(SwipeContacts.this, com.michaelwheeler.networkinggame.Contact.class);
+        startActivity(intent);
+    }
 
 }

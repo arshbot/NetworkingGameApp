@@ -3,7 +3,7 @@ package com.example.harshagoli.networkinggame;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class Contact  extends RealmObject {
+public class Contact extends RealmObject {
 
     @PrimaryKey
     private String ID;
