@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 28
@@ -10,6 +11,12 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath false
+            }
+        }
     }
     buildTypes {
         release {
@@ -28,10 +35,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile 'com.twitter.sdk.android:twitter-core:3.1.1'
-    compile('com.twitter.sdk.android:tweet-ui:3.1.1') {
-        exclude group: 'com.android.support'
-        exclude module: 'appcompat-v7'
-        exclude module: 'support-v4'
-    }
+    
+    implementation 'com.lorentzos.swipecards:library:1.0.9'
+    implementation 'com.jakewharton:butterknife:5.1.2'
+
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+android:layout_height="match_parent">
+
+
+
+    <com.lorentzos.flingswipe.SwipeFlingAdapterView
+        android:id="@+id/frame"
+        android:background="#ffeee9e2"
+        android:layout_width="match_parent"
+        android:layout_height="600dp">
+
+    </com.lorentzos.flingswipe.SwipeFlingAdapterView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="600dp"
+        android:orientation="vertical">
+
+
+        <Button
+            android:id="@+id/buttonGoToContacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show All Contacts"
+            android:onClick="displayContactsPage"
+            />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

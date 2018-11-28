@@ -2,17 +2,21 @@ package com.michaelwheeler.networkinggame;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.content.Intent;
-
 import com.example.harshagoli.networkinggame.R;
+
 import com.sarahansari.networkinggame.ContactDetails;
 
 import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class Contact extends AppCompatActivity {
     ListView listView;
@@ -24,20 +28,21 @@ public class Contact extends AppCompatActivity {
         listView = (ListView) findViewById( R.id.listView );
         final ArrayList<String> arrayList= new ArrayList<>();
 
-        arrayList.add("John"  );
-        arrayList.add("Obama"  );
-        arrayList.add("Teddy"  );
-        arrayList.add("Beyonce"  );
-        arrayList.add("Jack Frost"  );
-        arrayList.add("Shrek"  );
-        arrayList.add("Chris"  );
-        arrayList.add("Jaws"  );
-        arrayList.add("Will "  );
-        arrayList.add("Kim"  );
-        arrayList.add("George"  );
-        arrayList.add("Washington"  );
-        arrayList.add("Dad"  );
-        arrayList.add("The Weird Guy"  );
+        Realm realm = Realm.getDefaultInstance();
+
+        RealmResults<com.example.harshagoli.networkinggame.Contact> contacts =
+                realm.where(com.example.harshagoli.networkinggame.Contact.class).findAll();
+
+
+
+        Log.d("Contact count", Integer.toString(contacts.size()));
+
+        for(int i = 0 ; i < contacts.size(); i++)
+        {
+            arrayList.add(contacts.get(i).getName());
+        }
+
+
 
         ArrayAdapter arrayAdapter=new ArrayAdapter( this,android.R.layout.simple_list_item_1,arrayList );
         listView.setAdapter( arrayAdapter );

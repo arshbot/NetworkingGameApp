@@ -1,8 +1,12 @@
 package com.example.harshagoli.networkinggame;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -11,17 +15,29 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.provider.ContactsContract;
+import android.content.ContentResolver;
 
-import com.michaelwheeler.networkinggame.Contact;
 import com.sarahansari.networkinggame.ContactDetails;
+
+import java.util.ArrayList;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
+
+import static io.realm.Realm.getDefaultInstance;
+
 
 public class OnboardingFlow extends AppCompatActivity {
 
@@ -39,12 +55,13 @@ public class OnboardingFlow extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private Button importContacts;
+    private Realm realm = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding_flow);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -55,17 +72,91 @@ public class OnboardingFlow extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
+
+        Realm.init(this);    //initialize to access database for this activity
+        //Realm.deleteRealm(Realm.getDefaultConfiguration()); //do not do this it clears out entire thing
+        realm = Realm.getDefaultInstance();   //create a object for read and write database
+
+
+        int PERMISSION_ALL = 1;
+        String[] PERMISSIONS = {
+                android.Manifest.permission.READ_CONTACTS,
+                android.Manifest.permission.WRITE_CONTACTS,
+
+        };
+
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
+
+//        importContacts = (Button) findViewById(R.id.ImportContactsButton);
+//        importContacts.setOnClickListener(new View.OnClickListener() {
 //            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
+//            public void onClick(View v) {
+//
+//                loadContacts(0);
 //            }
 //        });
-
     }
 
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /*private void loadContacts (int x ){
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Contact contact = new Contact();
+                StringBuilder builder = new StringBuilder();
+                ContentResolver resolver = getContentResolver();
+                Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
+                Log.d("loadContacts",Integer.toString(cursor.getCount()) + " HERE HERE" );
+                while(cursor.moveToNext()){
+                    String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    String phoneNumber = " ";
+                    int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+                    if( hasNumber > 0)
+                    {
+                        Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
+                        while (cursor1.moveToNext())
+                        {
+                            phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+                        }
+                        cursor1.close();
+                    }
+                    else
+                    {
+                        phoneNumber = " ";
+                    }
+                    contact.setID(id);
+                    contact.setName(name);
+                    contact.setPhoneNumber(phoneNumber);
+                    contact.setIgnored(false);
+                    realm.insertOrUpdate(contact);
+                    builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+
+                }
+                cursor.close();
+                //RealmResults<Contact>
+                Log.d("loadContacts",  realm.where(Contact.class).findFirst().getPhoneNumber().toString());
+
+            }
+        });
+
+
+
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,7 +182,7 @@ public class OnboardingFlow extends AppCompatActivity {
         }
 
         if (id == R.id.action_contact) {
-            displayContactPage(this.findViewById(R.id.action_contact));
+            displayContactsPage(this.findViewById(R.id.action_contact));
         }
 
         return super.onOptionsItemSelected(item);
@@ -143,14 +234,20 @@ public class OnboardingFlow extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a WelcomeFragment (defined as a static inner class below).
-
+            Fragment f = null;
+            Log.d("myTag","FUCK FUCK FUCK FUCK FUCK FUCK" + position);
             switch(position) {
                 case 0:
-                    return WelcomeFragment.newInstance(position);
+                    f = WelcomeFragment.newInstance(position);
+                    break;
                 case 1:
-                    return SetUpOAuthFragment.newInstance(position);
+                    f = SetUpOAuthFragment.newInstance(position);
+                    break;
+                default:
+                    //It's fucked
             }
-            return WelcomeFragment.newInstance(position + 1);
+
+            return f;
         }
 
         @Override
@@ -165,9 +262,11 @@ public class OnboardingFlow extends AppCompatActivity {
          * The fragment argument representing the section number for this
          * fragment.
          */
-        //private static final String ARG_SECTION_NUMBER = "section_number";
+        private Button importContacts;
+        private Realm realm = null;
 
         public SetUpOAuthFragment() {
+            realm = Realm.getDefaultInstance();   //create a object for read and write database
         }
 
         /**
@@ -184,21 +283,122 @@ public class OnboardingFlow extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_set_up_oauth_flow, container, false);
 //            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
 //            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            importContacts = (Button) rootView.findViewById(R.id.ImportContactsButton);
+            importContacts.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    loadContacts(1);
+                    Intent k = new Intent(getActivity(), SwipeContacts.class);
+                    startActivity(k);
+                }
+            });
             return rootView;
         }
 
-    }
+        /*private void loadContacts(){
 
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Contact contact = new Contact();
+                    StringBuilder builder = new StringBuilder();
+                    ContentResolver resolver = getActivity().getContentResolver();
+                    Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
+                    Log.d("loadContacts",Integer.toString(cursor.getCount()) + " HERE HERE" );
+                    while(cursor.moveToNext()){
+                        String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                        String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                        String phoneNumber = " ";
+                        int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+                        if (hasNumber > 0) {
+                            Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
+                            while (cursor1.moveToNext()) {
+                                phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+                            }
+                            cursor1.close();
+                        }else
+                            phoneNumber = " ";
+
+                        contact.setID(id);
+                        contact.setName(name);
+                        contact.setPhoneNumber(phoneNumber);
+                        contact.setIgnored(false);
+                        realm.insertOrUpdate(contact);
+                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+
+                    }
+                    cursor.close();
+                    //Log.d("loadContacts",  builder.toString());
+
+                }
+            });
+
+            Intent k = new Intent(getActivity(), SwipeContacts.class);
+            startActivity(k);
+//            Log.d("loadContacts",  builder.toString());
+        }*/
+
+        private void loadContacts (int x ){
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Contact contact = new Contact();
+                    StringBuilder builder = new StringBuilder();
+                    ContentResolver resolver = getActivity().getContentResolver();
+                    Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
+                    Log.d("loadContacts",Integer.toString(cursor.getCount()) + " HERE HERE" );
+                    while(cursor.moveToNext()){
+                        String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                        String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                        String phoneNumber = " ";
+                        int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+                        if( hasNumber > 0)
+                        {
+                            Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
+                            while (cursor1.moveToNext())
+                            {
+                                phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+                            }
+                            cursor1.close();
+                        }
+                        else
+                        {
+                            phoneNumber = " ";
+                        }
+                        contact.setID(id);
+                        contact.setName(name);
+                        contact.setPhoneNumber(phoneNumber);
+                        contact.setIgnored(false);
+                        realm.insertOrUpdate(contact);
+                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
+
+                    }
+                    cursor.close();
+                    //RealmResults<Contact>
+                    Log.d("loadContacts",  realm.where(Contact.class).findFirst().getPhoneNumber().toString());
+
+                }
+            });
+
+
+
+        }
+
+
+    }
     public void displayProfileDetailsPage(View view)
     {
         Intent intent = new Intent(OnboardingFlow.this, ContactDetails.class);
         startActivity(intent);
     }
 
-    public void displayContactPage(View view)
+    public void displayContactsPage(View view)
     {
-        Intent intent = new Intent(OnboardingFlow.this, Contact.class);
+        Intent intent = new Intent(OnboardingFlow.this, com.michaelwheeler.networkinggame.Contact.class);
         startActivity(intent);
-
     }
 }

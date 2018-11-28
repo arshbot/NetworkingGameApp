@@ -10,19 +10,4 @@
         android:id="@+id/textViewShowContactData"
         />
 
-
-    <TextView
-        android:id="@android:id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:gravity="center_horizontal|center_vertical"
-        android:text="No Tweets" />
-
-    <ListView android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="#e1e8ed"
-        android:dividerHeight="1dp"
-        android:drawSelectorOnTop="false"/>
 </LinearLayout>
