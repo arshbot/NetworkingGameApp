@@ -96,7 +96,7 @@ public class SwipeContacts extends AppCompatActivity  {
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
                 final TimerModel tm = new TimerModel();
-                
+
 
 
 
