@@ -38,5 +38,4 @@ dependencies {
     
     implementation 'com.lorentzos.swipecards:library:1.0.9'
     implementation 'com.jakewharton:butterknife:5.1.2'
-
 }
