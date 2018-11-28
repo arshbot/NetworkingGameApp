@@ -107,54 +107,6 @@ public class OnboardingFlow extends AppCompatActivity {
         return true;
     }
 
-    private void loadContacts (int x ){
-
-        realm.executeTransaction(new Realm.Transaction() {
-        @Override
-        public void execute(Realm realm) {
-            Contact contact = new Contact();
-            StringBuilder builder = new StringBuilder();
-            ContentResolver resolver = getContentResolver();
-            Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
-            Log.d("loadContacts",Integer.toString(cursor.getCount()) + " HERE HERE" );
-            while(cursor.moveToNext()){
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                String phoneNumber = " ";
-                int hasNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-                if( hasNumber > 0)
-                {
-                    Cursor cursor1 = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? ", new String[]{id}, null);
-                    while (cursor1.moveToNext())
-                    {
-                         phoneNumber = cursor1.getString(cursor1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
-                    }
-                    cursor1.close();
-                }
-                else
-                    {
-                    phoneNumber = " ";
-                }
-                contact.setID(id);
-                contact.setName(name);
-                contact.setPhoneNumber(phoneNumber);
-                contact.setIgnored(false);
-                realm.insertOrUpdate(contact);
-                builder.append("Contact : ").append(name).append(", PhoneNumber : ").append(phoneNumber).append("\n\n");
-
-            }
-            cursor.close();
-            //RealmResults<Contact>
-            Log.d("loadContacts",  realm.where(Contact.class).findFirst().getPhoneNumber().toString());
-
-        }
-    });
-
-
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -224,7 +176,6 @@ public class OnboardingFlow extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             // Return a WelcomeFragment (defined as a static inner class below).
             Fragment f = null;
-            Log.d("myTag","FUCK FUCK FUCK FUCK FUCK FUCK" + position);
             switch(position) {
                 case 0:
                     f = WelcomeFragment.newInstance(position);
@@ -338,7 +289,6 @@ public class OnboardingFlow extends AppCompatActivity {
                     StringBuilder builder = new StringBuilder();
                     ContentResolver resolver = getActivity().getContentResolver();
                     Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null,null,null,null);
-                    Log.d("loadContacts",Integer.toString(cursor.getCount()) + " HERE HERE" );
                     while(cursor.moveToNext()){
                         String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                         String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
@@ -367,7 +317,6 @@ public class OnboardingFlow extends AppCompatActivity {
 
                     }
                     cursor.close();
-                    //RealmResults<Contact>
                     Log.d("loadContacts",  realm.where(Contact.class).findFirst().getPhoneNumber().toString());
 
                 }

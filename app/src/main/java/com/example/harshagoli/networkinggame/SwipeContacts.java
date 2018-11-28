@@ -52,7 +52,7 @@ public class SwipeContacts extends Activity {
 
         for (Contact c: listOfContacts) {
             listOfContactsArray.add(c.getName());
-        };
+        }
 
 
         arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.contactName, listOfContactsArray);
