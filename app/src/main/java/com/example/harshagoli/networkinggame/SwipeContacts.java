@@ -13,22 +13,20 @@ import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.RealmQuery;
 
 
 public class SwipeContacts extends Activity {
 
-    private ArrayList<String> al;
+    private RealmResults<Contact> listOfContacts;
     private ArrayAdapter<String> arrayAdapter;
+    final ArrayList<String> listOfContactsArray = null;
     private int i;
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        this.setContentView(R.layout.swipe_contacts);
-//
-//    }
+    private Realm realm = null;
 
     @Override
     public void onBackPressed() {
@@ -45,18 +43,19 @@ public class SwipeContacts extends Activity {
         ButterKnife.inject(this);
         flingContainer = findViewById(R.id.frame);
 
+        realm = Realm.getDefaultInstance();   //create a object for read and write database
+        final ArrayList<String> listOfContactsArray = new ArrayList<String>();
+        listOfContacts = realm.where(Contact.class)
+                .equalTo("isIgnored", Boolean.FALSE)
+//                .between("count", 0, 20)
+                .findAll();
 
-        al = new ArrayList<>();
-        al.add("php");
-        al.add("c");
-        al.add("python");
-        al.add("java");
-        al.add("html");
-        al.add("c++");
-        al.add("css");
-        al.add("javascript");
+        for (Contact c: listOfContacts) {
+            listOfContactsArray.add(c.getName());
+        };
 
-        arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.helloText, al );
+
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.item, R.id.contactName, listOfContactsArray);
 
         flingContainer.setAdapter(arrayAdapter);
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
@@ -64,7 +63,7 @@ public class SwipeContacts extends Activity {
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
-                al.remove(0);
+                listOfContactsArray.remove(0);
                 arrayAdapter.notifyDataSetChanged();
             }
 
@@ -84,7 +83,7 @@ public class SwipeContacts extends Activity {
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
-                al.add("XML ".concat(String.valueOf(i)));
+                listOfContactsArray.add("XML ".concat(String.valueOf(i)));
                 arrayAdapter.notifyDataSetChanged();
                 Log.d("LIST", "notified");
                 i++;
@@ -126,8 +125,6 @@ public class SwipeContacts extends Activity {
     public void left() {
         flingContainer.getTopCardListener().selectLeft();
     }
-
-
 
 
 }
